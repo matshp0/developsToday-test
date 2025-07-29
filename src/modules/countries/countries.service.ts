@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { AxiosError } from 'axios';
 import { firstValueFrom } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -14,24 +14,11 @@ import {
 export class CountriesService {
   private readonly dateNagerApi = 'https://date.nager.at/api/v3';
   private readonly countriesNowApi = 'https://countriesnow.space/api/v0.1';
-  private readonly logger = new Logger(CountriesService.name);
 
   constructor(private httpService: HttpService) {}
 
   async getAvailableCountries(): Promise<Country[]> {
-    const { data } = await firstValueFrom(
-      this.httpService
-        .get<Country[]>(`${this.dateNagerApi}/AvailableCountries`)
-        .pipe(
-          catchError((error: AxiosError) => {
-            this.logger.error(error.response?.data);
-            throw new Error(
-              'An error happened while fetching available countries!',
-            );
-          }),
-        ),
-    );
-    return data;
+    return await this.fetchAllCountries();
   }
 
   async getCountryInfo(code: string) {
@@ -48,6 +35,22 @@ export class CountriesService {
     };
   }
 
+  private async fetchAllCountries() {
+    const { data } = await firstValueFrom(
+      this.httpService
+        .get<Country[]>(`${this.dateNagerApi}/AvailableCountries`)
+        .pipe(
+          catchError((error: AxiosError) => {
+            throw new Error(
+              'An error happened while fetching available countries!',
+              error,
+            );
+          }),
+        ),
+    );
+    return data;
+  }
+
   private async fetchPopulationData(country: string) {
     const { data } = await firstValueFrom(
       this.httpService
@@ -59,7 +62,11 @@ export class CountriesService {
         )
         .pipe(
           catchError((error: AxiosError) => {
-            this.logger.error(error.response?.data);
+            if (error.response?.status === 404) {
+              throw new NotFoundException(
+                `Country with name ${country} not found`,
+              );
+            }
             throw new Error(
               'An error happened while fetching population data!',
             );
@@ -75,7 +82,11 @@ export class CountriesService {
         .get<CountryInfoResponse>(`${this.dateNagerApi}/countryinfo/${code}`)
         .pipe(
           catchError((error: AxiosError) => {
-            this.logger.error(error.response?.data);
+            if (error.response?.status === 404) {
+              throw new NotFoundException(
+                `Country with code ${code} not found`,
+              );
+            }
             throw new Error('An error happened while fetching borders!');
           }),
         ),
@@ -94,8 +105,12 @@ export class CountriesService {
         )
         .pipe(
           catchError((error: AxiosError) => {
-            this.logger.error(error.response?.data);
-            throw new Error('An error happened while fetching flag URL!');
+            if (error.response?.status === 404) {
+              throw new NotFoundException(
+                `Country with name ${country} not found`,
+              );
+            }
+            throw new Error('An error happened while fetching borders!');
           }),
         ),
     );

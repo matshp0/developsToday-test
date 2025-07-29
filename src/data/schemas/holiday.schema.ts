@@ -12,6 +12,9 @@ export class Holiday {
   name: string;
 
   @Prop({ required: true })
+  countryCode: string;
+
+  @Prop({ required: true })
   date: string;
 }
 

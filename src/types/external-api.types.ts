@@ -46,7 +46,7 @@ export interface CountryInfoResponse {
   borders: BorderCountry[];
 }
 
-export interface Holiday {
+export interface HolidayInfo {
   date: string;
   localName: string;
   name: string;
@@ -58,4 +58,12 @@ export interface Holiday {
   types: string[];
 }
 
-export type HolidayResponse = Holiday[];
+export type HolidayResponse = HolidayInfo[];
+
+export interface HolidayBadRequestResponse {
+  title: string;
+  status: number;
+  errors: {
+    [key: string]: string[];
+  };
+}
