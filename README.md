@@ -38,7 +38,7 @@ A NestJS-based API that provides country information and allows users to add nat
 3.  Set up environment variables: Create a `.env` file in the root directory and add:
 
     ```
-    DATABASE_URL=mongodb://mongo:secret@localhost:27017/mydb
+    DATABASE_URL=mongodb://mongo:secret@localhost:27017
 
     ```
 
