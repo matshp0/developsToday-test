@@ -12,7 +12,7 @@ import {
 
 @Injectable()
 export class CountriesService {
-  private readonly dateNagerApi = 'https://dte.nager.at/api/v3';
+  private readonly dateNagerApi = 'https://date.nager.at/api/v3';
   private readonly countriesNowApi = 'https://countriesnow.space/api/v0.1';
   private readonly logger = new Logger(CountriesService.name);
 
